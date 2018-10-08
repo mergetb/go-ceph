@@ -33,10 +33,10 @@ func CreateMount() (*MountInfo, error) {
 	}
 }
 
-func (mount *MountInfo) RemoveMount() error {
+func (mount *MountInfo) RemoveDir() error {
 	path := mount.Path
 	if path == "" {
-		return fmt.Errorf("RemoveMount has no path attribute, seek or MakeDir")
+		return fmt.Errorf("RemoveDir has no path attribute, seek or MakeDir")
 	}
 	c_path := C.CString(path)
 	defer C.free(unsafe.Pointer(c_path))
