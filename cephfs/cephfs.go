@@ -20,6 +20,7 @@ func (e CephError) Error() string {
 //
 type MountInfo struct {
 	mount *C.struct_ceph_mount_info
+	Path  string
 }
 
 func CreateMount() (*MountInfo, error) {
@@ -30,6 +31,28 @@ func CreateMount() (*MountInfo, error) {
 	} else {
 		return nil, CephError(ret)
 	}
+}
+
+func (mount *MountInfo) RemoveMount() error {
+	path := mount.Path
+	if path == "" {
+		return fmt.Errorf("RemoveMount has no path attribute, seek or MakeDir")
+	}
+	c_path := C.CString(path)
+	defer C.free(unsafe.Pointer(c_path))
+
+	ret := C.ceph_rmdir(mount.mount, c_path)
+	if ret == 0 {
+		return nil
+	} else {
+		return CephError(ret)
+	}
+}
+
+func (mount *MountInfo) SetMountPath() error {
+	path := C.ceph_getcwd(mount)
+	mount.Path = path
+	return nil
 }
 
 func (mount *MountInfo) ReadDefaultConfigFile() error {
@@ -70,13 +93,15 @@ func (mount *MountInfo) ChangeDir(path string) error {
 
 	ret := C.ceph_chdir(mount.mount, c_path)
 	if ret == 0 {
-		return nil
+		err := mount.SetMountPath()
+		return err
 	} else {
 		return CephError(ret)
 	}
 }
 
 func (mount *MountInfo) MakeDir(path string, mode uint32) error {
+	mount.Path = path
 	c_path := C.CString(path)
 	defer C.free(unsafe.Pointer(c_path))
 
