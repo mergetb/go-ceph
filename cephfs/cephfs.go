@@ -200,24 +200,27 @@ func (mount *MountInfo) ReadDir(directory *Directory) error {
 	//dirent := &syscall.Dirent{}
 
 	/*
-			           struct dirent {
-		               ino_t          d_ino;       // Inode number
-		               off_t          d_off;       // Not an offset; see below
-		               unsigned short d_reclen;    // Length of this record
-		               unsigned char  d_type;      // Type of file; not supported
-		                                           //  by all filesystem types
-		               char           d_name[256]; // Null-terminated filename
-		           };
+		struct dirent {
+			ino_t          d_ino;		// Inode number
+			off_t          d_off;		// Not an offset; see below
+			unsigned short d_reclen;	// Length of this record
+			unsigned char  d_type;		// Type of file; not supported
+							//  by all filesystem types
+			char           d_name[256]; // Null-terminated filename
+		};
 	*/
 
 	log.Infof("calling readdir")
-	dirent := &C.struct_dirent{}
-	ret := C.ceph_readdir_r(mount.mount, directory.dir, dirent)
-	if ret != 0 {
-		log.Errorf("ReadDir: Failed to read: %#v", directory)
-		return cephError(ret)
-	}
-	log.Infof("worked")
+	//dirent := &C.struct_dirent{}
+	//ret := C.ceph_readdir_r(mount.mount, directory.dir, dirent)
+	dirent := C.ceph_readdir(mount.mount, directory.dir)
+	/*
+		if ret != 0 {
+			log.Errorf("ReadDir: Failed to read: %#v", directory)
+			return cephError(ret)
+		}
+	*/
+	log.Infof("worked? %v", dirent)
 
 	sysDirent := interface{}(dirent).(syscall.Dirent)
 
