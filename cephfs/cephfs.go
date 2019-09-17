@@ -10,10 +10,11 @@ import "C"
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"math"
 	"syscall"
 	"unsafe"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type cephError int
@@ -191,6 +192,36 @@ func (mount *MountInfo) CloseDir(directory *Directory) error {
 		log.Errorf("CloseDir: Failed to close: %#v", directory)
 		return cephError(ret)
 	}
+	return nil
+}
+
+// ReadDir closes the directory
+func (mount *MountInfo) ReadDir(directory *Directory) error {
+	//dirent := &syscall.Dirent{}
+
+	/*
+			           struct dirent {
+		               ino_t          d_ino;       // Inode number
+		               off_t          d_off;       // Not an offset; see below
+		               unsigned short d_reclen;    // Length of this record
+		               unsigned char  d_type;      // Type of file; not supported
+		                                           //  by all filesystem types
+		               char           d_name[256]; // Null-terminated filename
+		           };
+	*/
+
+	dirent := &C.struct_dirent{}
+	ret := C.ceph_readdir_r(mount.mount, directory.dir, dirent)
+	if ret != 0 {
+		log.Errorf("ReadDir: Failed to read: %#v", directory)
+		return cephError(ret)
+	}
+	sysDirent := interface{}(dirent).(syscall.Dirent)
+
+	log.Infof("dirent: %#v", sysDirent)
+
+	//for
+
 	return nil
 }
 
