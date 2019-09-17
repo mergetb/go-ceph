@@ -210,17 +210,18 @@ func (mount *MountInfo) ReadDir(directory *Directory) error {
 		           };
 	*/
 
+	log.Infof("calling readdir")
 	dirent := &C.struct_dirent{}
 	ret := C.ceph_readdir_r(mount.mount, directory.dir, dirent)
 	if ret != 0 {
 		log.Errorf("ReadDir: Failed to read: %#v", directory)
 		return cephError(ret)
 	}
+	log.Infof("worked")
+
 	sysDirent := interface{}(dirent).(syscall.Dirent)
 
 	log.Infof("dirent: %#v", sysDirent)
-
-	//for
 
 	return nil
 }
