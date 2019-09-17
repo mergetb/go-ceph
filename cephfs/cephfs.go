@@ -30,7 +30,11 @@ func (e cephError) Error() string {
 
 // Directory exports ceph's ceph_dir_result from libcephfs
 type Directory struct {
-	dir    *C.struct_ceph_dir_result
+	dir *C.struct_ceph_dir_result
+}
+
+// Dirent from linux
+type Dirent struct {
 	handle *C.struct_dirent
 }
 
@@ -172,8 +176,8 @@ func (mount *MountInfo) Chown(path string, user uint32, group uint32) error {
 }
 
 // OpenDir opens the directory
-func (mount *MountInfo) OpenDir(path string) (Directory, error) {
-	result := Directory{}
+func (mount *MountInfo) OpenDir(path string) (**Directory, error) {
+	result := &Directory{}
 
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
@@ -181,9 +185,9 @@ func (mount *MountInfo) OpenDir(path string) (Directory, error) {
 	ret := C.ceph_opendir(mount.mount, cPath, &result.dir)
 	if ret != 0 {
 		log.Errorf("OpenDir: Failed to open: %s", path)
-		return Directory{}, cephError(ret)
+		return nil, cephError(ret)
 	}
-	return result, nil
+	return &result, nil
 }
 
 // CloseDir closes the directory
@@ -198,7 +202,7 @@ func (mount *MountInfo) CloseDir(directory *Directory) error {
 }
 
 // ReadDir closes the directory
-func (mount *MountInfo) ReadDir(directory *Directory) *C.struct_dirent {
+func (mount *MountInfo) ReadDir(directory Directory) *Dirent {
 	//dirent := &syscall.Dirent{}
 
 	/*
@@ -212,10 +216,10 @@ func (mount *MountInfo) ReadDir(directory *Directory) *C.struct_dirent {
 		};
 	*/
 
-	//directory.handle = &C.struct_dirent{}
+	dirent := &Dirent{}
 	//log.Infof("calling readdir")
 	//ret := C.ceph_readdir_r(mount.mount, directory.dir, dirent)
-	x := C.ceph_readdir(mount.mount, directory.dir)
+	dirent.handle = C.ceph_readdir(mount.mount, directory.dir)
 	/*
 		if ret != 0 {
 			log.Errorf("ReadDir: Failed to read: %#v", directory)
@@ -224,7 +228,7 @@ func (mount *MountInfo) ReadDir(directory *Directory) *C.struct_dirent {
 	*/
 	log.Infof("worked")
 
-	s := reflect.ValueOf(x).Elem()
+	s := reflect.ValueOf(dirent.handle).Elem()
 	typeOfT := s.Type()
 
 	for i := 0; i < s.NumField(); i++ {
@@ -233,9 +237,9 @@ func (mount *MountInfo) ReadDir(directory *Directory) *C.struct_dirent {
 			typeOfT.Field(i).Name, f.Type(), f.Interface())
 	}
 
-	log.Infof("dirent: %#v", x)
+	log.Infof("dirent: %#v", dirent.handle)
 
-	return x
+	return dirent
 }
 
 // IsMounted checks mount status.
