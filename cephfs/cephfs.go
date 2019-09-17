@@ -171,8 +171,8 @@ func (mount *MountInfo) Chown(path string, user uint32, group uint32) error {
 }
 
 // OpenDir opens the directory
-func (mount *MountInfo) OpenDir(path string) (*Directory, error) {
-	result := &Directory{}
+func (mount *MountInfo) OpenDir(path string) (Directory, error) {
+	result := Directory{}
 
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
@@ -180,7 +180,7 @@ func (mount *MountInfo) OpenDir(path string) (*Directory, error) {
 	ret := C.ceph_opendir(mount.mount, cPath, &result.dir)
 	if ret != 0 {
 		log.Errorf("OpenDir: Failed to open: %s", path)
-		return nil, cephError(ret)
+		return Directory{}, cephError(ret)
 	}
 	return result, nil
 }
@@ -197,7 +197,7 @@ func (mount *MountInfo) CloseDir(directory *Directory) error {
 }
 
 // ReadDir closes the directory
-func (mount *MountInfo) ReadDir(directory *Directory) error {
+func (mount *MountInfo) ReadDir(directory *Directory) syscall.Dirent {
 	//dirent := &syscall.Dirent{}
 
 	/*
@@ -211,21 +211,23 @@ func (mount *MountInfo) ReadDir(directory *Directory) error {
 		};
 	*/
 
-	directory.handle = &C.struct_dirent{}
-	log.Infof("calling readdir")
+	//directory.handle = &C.struct_dirent{}
+	//log.Infof("calling readdir")
 	//ret := C.ceph_readdir_r(mount.mount, directory.dir, dirent)
-	ret := C.ceph_readdir_r(mount.mount, directory.dir, directory.handle)
-	if ret != 0 {
-		log.Errorf("ReadDir: Failed to read: %#v", directory)
-		return cephError(ret)
-	}
+	x := C.ceph_readdir(mount.mount, directory.dir)
+	/*
+		if ret != 0 {
+			log.Errorf("ReadDir: Failed to read: %#v", directory)
+			return cephError(ret)
+		}
+	*/
 	log.Infof("worked")
 
-	sysDirent := interface{}(directory.handle).(syscall.Dirent)
+	sysDirent := interface{}(x).(syscall.Dirent)
 
 	log.Infof("dirent: %#v", sysDirent)
 
-	return nil
+	return sysDirent
 }
 
 // IsMounted checks mount status.
