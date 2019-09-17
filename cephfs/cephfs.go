@@ -29,7 +29,8 @@ func (e cephError) Error() string {
 
 // Directory exports ceph's ceph_dir_result from libcephfs
 type Directory struct {
-	dir *C.struct_ceph_dir_result
+	dir    *C.struct_ceph_dir_result
+	handle *C.struct_dirent
 }
 
 // MountInfo exports ceph's ceph_mount_info from libcephfs
@@ -210,19 +211,17 @@ func (mount *MountInfo) ReadDir(directory *Directory) error {
 		};
 	*/
 
+	directory.handle = &C.struct_dirent{}
 	log.Infof("calling readdir")
-	//dirent := &C.struct_dirent{}
 	//ret := C.ceph_readdir_r(mount.mount, directory.dir, dirent)
-	dirent := C.ceph_readdir(mount.mount, directory.dir)
-	/*
-		if ret != 0 {
-			log.Errorf("ReadDir: Failed to read: %#v", directory)
-			return cephError(ret)
-		}
-	*/
-	log.Infof("worked? %v", dirent)
+	ret := C.ceph_readdir_r(mount.mount, directory.dir, directory.handle)
+	if ret != 0 {
+		log.Errorf("ReadDir: Failed to read: %#v", directory)
+		return cephError(ret)
+	}
+	log.Infof("worked")
 
-	sysDirent := interface{}(dirent).(syscall.Dirent)
+	sysDirent := interface{}(directory.handle).(syscall.Dirent)
 
 	log.Infof("dirent: %#v", sysDirent)
 
