@@ -223,7 +223,7 @@ func (mount *MountInfo) ReadDir(directory *Directory) syscall.Dirent {
 	*/
 	log.Infof("worked")
 
-	sysDirent := interface{}(x).(syscall.Dirent)
+	sysDirent := interface{}(*x).(syscall.Dirent)
 
 	log.Infof("dirent: %#v", sysDirent)
 
