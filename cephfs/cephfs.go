@@ -11,6 +11,7 @@ import "C"
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"syscall"
 	"unsafe"
 
@@ -197,7 +198,7 @@ func (mount *MountInfo) CloseDir(directory *Directory) error {
 }
 
 // ReadDir closes the directory
-func (mount *MountInfo) ReadDir(directory *Directory) syscall.Dirent {
+func (mount *MountInfo) ReadDir(directory *Directory) *C.struct_dirent {
 	//dirent := &syscall.Dirent{}
 
 	/*
@@ -223,11 +224,18 @@ func (mount *MountInfo) ReadDir(directory *Directory) syscall.Dirent {
 	*/
 	log.Infof("worked")
 
-	sysDirent := interface{}(*x).(syscall.Dirent)
+	s := reflect.ValueOf(x).Elem()
+	typeOfT := s.Type()
 
-	log.Infof("dirent: %#v", sysDirent)
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+		fmt.Printf("%d: %s %s = %v\n", i,
+			typeOfT.Field(i).Name, f.Type(), f.Interface())
+	}
 
-	return sysDirent
+	log.Infof("dirent: %#v", x)
+
+	return x
 }
 
 // IsMounted checks mount status.
