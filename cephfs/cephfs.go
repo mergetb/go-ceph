@@ -229,6 +229,8 @@ func (mount *MountInfo) ReadDir(directory Directory) *Dirent {
 	log.Infof("worked")
 
 	s := reflect.ValueOf(dirent.handle).Elem()
+	log.Infof("dir: %#v", reflect.ValueOf(dirent.handle))
+	log.Infof("dir: %#v", s)
 	typeOfT := s.Type()
 
 	for i := 0; i < s.NumField(); i++ {
