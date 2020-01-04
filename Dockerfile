@@ -25,8 +25,8 @@ RUN groupadd -g 1010 bob
 RUN useradd -u 1010 -g bob -M bob
 
 ENV GOPATH /go
-WORKDIR /go/src/github.com/ceph/go-ceph
-VOLUME /go/src/github.com/ceph/go-ceph
+WORKDIR /go/src/github.com/mergetb/go-ceph
+VOLUME /go/src/github.com/mergetb/go-ceph
 
 COPY micro-osd.sh /
 COPY entrypoint.sh /

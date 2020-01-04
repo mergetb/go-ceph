@@ -29,7 +29,7 @@ before_script:
 
 # cephfs (fuse) requires: --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined
 script:
-  - docker run --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined --rm -it -v ${PWD}:/go/src/github.com/ceph/go-ceph:z ceph-golang-ci
+  - docker run --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined --rm -it -v ${PWD}:/go/src/github.com/mergetb/go-ceph:z ceph-golang-ci
 # run golint and other style checks
   - go get golang.org/x/lint/golint
   - make check

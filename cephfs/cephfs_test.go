@@ -2,7 +2,7 @@ package cephfs_test
 
 import (
 	"fmt"
-	"github.com/ceph/go-ceph/cephfs"
+	"github.com/mergetb/go-ceph/cephfs"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"syscall"

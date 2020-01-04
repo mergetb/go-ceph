@@ -1,10 +1,10 @@
 # go-ceph - Go bindings for Ceph APIs
 
-[![Build Status](https://travis-ci.org/ceph/go-ceph.svg)](https://travis-ci.org/ceph/go-ceph) [![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/ceph/go-ceph) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/ceph/go-ceph/master/LICENSE)
+[![Build Status](https://travis-ci.org/mergetb/go-ceph.svg)](https://travis-ci.org/mergetb/go-ceph) [![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/mergetb/go-ceph) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/mergetb/go-ceph/master/LICENSE)
 
 ## Installation
 
-    go get github.com/ceph/go-ceph
+    go get github.com/mergetb/go-ceph
 
 The native RADOS library and development headers are expected to be installed.
 
@@ -21,7 +21,7 @@ libcephfs-devel librbd-devel librados-devel
 ## Documentation
 
 Detailed documentation is available at
-<http://godoc.org/github.com/ceph/go-ceph>.
+<http://godoc.org/github.com/mergetb/go-ceph>.
 
 ### Connecting to a cluster
 
@@ -104,7 +104,7 @@ conn.DeletePool("new_pool")
 ```
 docker run --rm -it --net=host \
   --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined \
-  -v ${PWD}:/go/src/github.com/ceph/go-ceph:z \
+  -v ${PWD}:/go/src/github.com/mergetb/go-ceph:z \
   -v /home/nwatkins/src/ceph/build:/home/nwatkins/src/ceph/build:z \
   -e CEPH_CONF=/home/nwatkins/src/ceph/build/ceph.conf \
   ceph-golang
